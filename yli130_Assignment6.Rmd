@@ -1,0 +1,161 @@
+---
+title: "yli130_Assignment6"
+author: "Yanxi Li"
+date: "11/20/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+```
+lp file:
+
+// Objective function
+max: 5 x12 + 3 x13 + 3 x35 + 2 x25 + 4 x24 + 6 x57 + 2 x58 + 1 x46 + 4 x47 + 5 x69 + 4 x79 + 7 x89;
+
+// Constraints
+x12 + x13 <= 1;
+x35 + x25 + x24 <= 1;
+x58 + x57 + x46 + x47 <= 1;
+x69 + x79 + x89 <= 1;
+x12 + x35 <= 1;
+x13 + x24 + x25 <= 1;
+x35 + x46 + x47 <= 1;
+x25 + x46 + x47 <= 1;
+x24 + x57 + x58 <= 1;
+x58 + x69 + x79 <= 1;
+x57 + x69 + x89 <= 1;
+x47 + x69 + x89 <= 1;
+x46 + x79 + x89 <= 1;
+
+bin x12, x13, x35, x25, x24, x57, x58, x46, x47, x69, x79, x89;
+```
+
+```{r}
+library(lpSolveAPI)                       # import library
+Question_1 <- read.lp('Question_1.lp')    # import lp file
+
+solve(Question_1)                         # solve lp file
+get.objective(Question_1)                 # get the objective function value            
+get.variables(Question_1)                 # get the decision variables value
+```
+From the objective value, the longest path is 17.
+
+The path is 1-2-5-7-9.
+
+\newpage
+## Question 2
+
+
+### Integer 
+```
+integer lp file:
+
+// Objective function
+max: 4000 x1 + 6500 x2 + 5900 x3 + 5400 x4 + 5150 x5 + 10000 x6 + 8400 x7 + 6250 x8;
+
+// Constraints
+T: 40 x1 + 50 x2 + 80 x3 + 60 x4 + 45 x5 + 60 x6 + 30 x7 + 25 x8 <= 2500;
+S: 40 x1 + 50 x2 + 80 x3 <= 1000;
+H: 60 x4 + 45 x5 + 60 x6 <= 1000;
+C: 30 x7 + 25 x8 <= 1000;
+S1: 40 x1 >= 100;
+S2: 50 x2 >= 100;
+S3: 80 x3 >= 100;
+H1: 60 x4 >= 100;
+H2: 45 x5 >= 100;
+H3: 60 x6 >= 100;
+C1: 30 x7 >= 100;
+C2: 25 x8 >= 100;
+
+// Integer definitions
+int x1, x2, x3, x4 ,x5, x6, x7, x8;
+```
+
+```{r}
+Question_2_int <- read.lp("Question_2.lp")    # import lp file
+Question_2_int                                # show lp file
+
+solve(Question_2_int)                         # solve lp file
+get.variables(Question_2_int)                 # get decision variables value
+get.objective(Question_2_int)                 # get objective function value
+```
+result data frame
+```{r}
+# Create Columns
+Types <- c('S1', 'S2', 'S3', 'H1', 'H2', 'H3', 'C1', 'C2')
+Number_of_Shares <- c(3000, 5000, 2000, 2000, 3000, 12000, 29000, 5000)
+Dollar_Amount <- c(120000, 250000, 160000, 120000, 135000, 720000, 870000, 125000)
+
+# Create data frame
+Shares_dataframe <- data.frame(Types, Number_of_Shares, Dollar_Amount)
+
+# show data frame
+Shares_dataframe
+```
+
+Total dollar return from both growth and dividends over the course of coming year is 477400.
+
+### No Integer
+```
+lp file:
+
+// Objective function
+max: 4000 x1 + 6500 x2 + 5900 x3 + 5400 x4 + 5150 x5 + 10000 x6 + 8400 x7 + 6250 x8;
+
+// Constraints
+T: 40 x1 + 50 x2 + 80 x3 + 60 x4 + 45 x5 + 60 x6 + 30 x7 + 25 x8 <= 2500;
+S: 40 x1 + 50 x2 + 80 x3 <= 1000;
+H: 60 x4 + 45 x5 + 60 x6 <= 1000;
+C: 30 x7 + 25 x8 <= 1000;
+S1: 40 x1 >= 100;
+S2: 50 x2 >= 100;
+S3: 80 x3 >= 100;
+H1: 60 x4 >= 100;
+H2: 45 x5 >= 100;
+H3: 60 x6 >= 100;
+C1: 30 x7 >= 100;
+C2: 25 x8 >= 100;
+```
+
+```{r}
+Question_2_not_integer <- read.lp('Question_2_not_integer.lp') # import data
+Question_2_not_integer                                         # show lp file
+
+solve(Question_2_not_integer)                                  # solve lp file
+get.variables(Question_2_not_integer)                          # get decision variables value
+get.objective(Question_2_not_integer)                          # get objective function values
+```
+Total dollar return for no integer restriction is is 487152.8.
+
+
+### Compare Solution
+```{r}
+# create columns
+Types <- c('S1', 'S2', 'S3', 'H1', 'H2', 'H3', 'C1', 'C2')
+Quantity_Integer <- c(3000, 5000, 2000, 2000, 3000, 12000, 29000, 5000)
+Quantity_No_Integer <- c(2500, 6000, 1250, 1667, 2222, 13333, 30000, 4000)
+# calculate alter percentage
+Integer_change <- (Quantity_Integer - Quantity_No_Integer) / (Quantity_No_Integer)
+Percentage_change <- c('20%', '-16.7%', '60%', '19.98%', '35%', '-10%', '-3.33%', '25%')
+
+# create data frame
+Compare_dataframe <- data.frame(Types, Quantity_Integer, Quantity_No_Integer, 
+                                                             Percentage_change)
+
+# show data frame
+Compare_dataframe
+```
+
+Total dollar return for integer is 477400.
+
+Total dollar return for no integer restriction is is 487152.8.
+
+Percentage for integer restriction change is (477400 - 487152.8)/487152.8 = -0.02 = -2%. 
+
+Integer restriction makes the amount of objective function decrease 2%.
+
